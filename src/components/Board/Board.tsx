@@ -1,33 +1,22 @@
 import { StyledBoard } from "./Board.styled";
 import Square from "../Square/Square";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 function Board() {
-  const BOARD = [
-    ["bp", "-", "bp", "-", "bp", "-", "bp", "-"],
-    ["-", "bp", "-", "bp", "-", "bp", "-", "bp"],
-    ["bp", "-", "bp", "-", "bp", "-", "bp", "-"],
-    ["-", "-", "-", "-", "-", "-", "-", "-"],
-    ["-", "-", "-", "-", "-", "-", "-", "-"],
-    ["-", "rp", "-", "rp", "-", "rp", "-", "rp"],
-    ["rp", "-", "rp", "-", "rp", "-", "rp", "-"],
-    ["-", "rp", "-", "rp", "-", "rp", "-", "rp"],
-  ];
+  const board = useSelector((state: RootState) => state.game.board);
 
   return (
     <StyledBoard>
-      {BOARD.map((row, rowIndex) => {
+      {board.map((row, rowIndex) => {
         return row.map((square, index) => {
-          const id = rowIndex * 8 + index;
           let dark = true;
-          if (
-            (rowIndex % 2 === 0 && index % 2 === 1) ||
-            (rowIndex % 2 === 1 && index % 2 === 0)
-          )
-            dark = false;
+          if (rowIndex % 2 !== index % 2) dark = false;
+
           return (
             <Square
-              key={id}
-              id={id}
+              key={rowIndex + "/" + index}
+              id={rowIndex + "/" + index}
               dark={dark}
               isEmpty={square === "-" || square === "a"}
               pawnColor={square[0] === "r" ? "red" : "black"}

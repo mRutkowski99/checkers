@@ -44,6 +44,7 @@ export const PawnOuter = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s;
 `;
 
 export const PawnInner = styled.div`
@@ -55,6 +56,7 @@ export const PawnInner = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s;
 
   svg {
     width: 60%;

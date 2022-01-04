@@ -3,12 +3,12 @@ import styled from "styled-components";
 interface IPros {
   dark: boolean;
   pointerCursor: boolean;
-  clicked: boolean;
+  selected: boolean;
   active: boolean;
 }
 
 export const StyledSquare = styled.div`
-  width: 5rem;
+  width: 7rem;
   aspect-ratio: 1;
   background-color: ${({ dark }: IPros) =>
     dark ? "rgba(108,64,35,255)" : "rgba(239,164,60,255)"};
@@ -34,7 +34,7 @@ export const StyledSquare = styled.div`
   }`}
 
   & > div {
-    transform: ${({ clicked }) =>
-      clicked ? "scale(1.1) translateY(-5px)" : "none"};
+    transform: ${({ selected }) =>
+      selected ? "scale(1.1) translateY(-5px)" : "none"};
   }
 `;
