@@ -16,9 +16,15 @@ interface IProps {
 function Square({ dark, id, isEmpty, pawnColor, isKing, active }: IProps) {
   const dispatch = useDispatch();
   const selectedId = useSelector((state: RootState) => state.game.selected);
+  const currentPlayer = useSelector(
+    (state: RootState) => state.game.currentPlayer
+  );
+  const possibleCaptures = useSelector(
+    (state: RootState) => state.game.possibleCaptures
+  );
 
   const clickHandler = () => {
-    if (!isEmpty && !isKing)
+    if (!isEmpty && currentPlayer === pawnColor && !isKing)
       dispatch(gameActions.clickPawn({ id: id, color: pawnColor }));
 
     if (isEmpty && active) dispatch(gameActions.selectMove({ id: id }));
@@ -27,8 +33,9 @@ function Square({ dark, id, isEmpty, pawnColor, isKing, active }: IProps) {
   return (
     <StyledSquare
       dark={dark}
-      pointerCursor={!isEmpty || active}
+      pointerCursor={(!isEmpty && currentPlayer === pawnColor) || active}
       active={active}
+      possibleCapture={possibleCaptures.includes(id)}
       onClick={clickHandler}
       selected={id === selectedId}
     >

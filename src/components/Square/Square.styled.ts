@@ -4,6 +4,7 @@ interface IPros {
   dark: boolean;
   pointerCursor: boolean;
   selected: boolean;
+  possibleCapture: boolean;
   active: boolean;
 }
 
@@ -15,6 +16,9 @@ export const StyledSquare = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  outline: solid 3px transparent;
+  outline-offset: -3px;
+  ${({ possibleCapture }) => possibleCapture && "outline-color: red;"}
   cursor: ${({ pointerCursor }) => (pointerCursor ? "pointer" : "default")};
   transition: all 0.2s;
   position: relative;
@@ -34,7 +38,8 @@ export const StyledSquare = styled.div`
   }`}
 
   & > div {
-    transform: ${({ selected }) =>
-      selected ? "scale(1.1) translateY(-5px)" : "none"};
+    ${({ selected }) =>
+      selected &&
+      "transform: scale(1.1) translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.5)"}
   }
 `;
