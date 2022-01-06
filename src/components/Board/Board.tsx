@@ -20,7 +20,7 @@ function Board() {
               dark={dark}
               isEmpty={square === "-" || square === "a"}
               pawnColor={square[0] === "r" ? "red" : "black"}
-              isKing={square[1] === "k"}
+              isKing={square.indexOf("k") !== -1}
               active={square === "a"}
             />
           );

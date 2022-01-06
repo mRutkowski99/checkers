@@ -24,8 +24,10 @@ function Square({ dark, id, isEmpty, pawnColor, isKing, active }: IProps) {
   );
 
   const clickHandler = () => {
-    if (!isEmpty && currentPlayer === pawnColor && !isKing)
-      dispatch(gameActions.clickPawn({ id: id, color: pawnColor }));
+    if (!isEmpty && currentPlayer === pawnColor)
+      dispatch(
+        gameActions.clickPawn({ id: id, color: pawnColor, isKing: isKing })
+      );
 
     if (isEmpty && active) dispatch(gameActions.selectMove({ id: id }));
   };
@@ -35,7 +37,7 @@ function Square({ dark, id, isEmpty, pawnColor, isKing, active }: IProps) {
       dark={dark}
       pointerCursor={(!isEmpty && currentPlayer === pawnColor) || active}
       active={active}
-      possibleCapture={possibleCaptures.includes(id)}
+      possibleCapture={Object.values(possibleCaptures).flat().includes(id)}
       onClick={clickHandler}
       selected={id === selectedId}
     >

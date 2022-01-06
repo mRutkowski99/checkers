@@ -1,6 +1,9 @@
 export interface IGameSlice {
   board: string[][];
   selected: string;
-  possibleCaptures: string[];
+  possibleCaptures: {
+    [key: string]: string[];
+  };
   currentPlayer: string;
+  movesWithoutCapture: number;
 }

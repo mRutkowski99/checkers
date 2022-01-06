@@ -6,26 +6,43 @@ export const clearActiveFields = (board: string[][]) => {
   );
 };
 
-const isCoordValid = (id: string) => {
+const isIdValid = (id: string) => {
   const [row, col] = id.split("/");
   if (+row < 0 || +row > 7) return false;
   if (+col < 0 || +col > 7) return false;
   return true;
 };
 
+const calcCapturedId = (
+  rowStart: string,
+  colStart: string,
+  rowEnd: string,
+  colEnd: string
+) => {
+  return `${Math.abs((+rowStart + +rowEnd) / 2)}/${Math.abs(
+    (+colStart + +colEnd) / 2
+  )}`;
+};
+
 interface ICaptures {
-  [key: string]: string;
+  [key: string]: string[];
 }
 
-export const findMoves = (id: string, color: string, board: string[][]) => {
+export const findMoves = (
+  id: string,
+  color: string,
+  board: string[][],
+  forward: number = 1
+) => {
   const possibleMoves: string[] = []; //stores coordinates of possible moves
-  const possibleCaptures: string[] = [];
-  // const possibleCapturedPieces: string[] = [];
-  const possibleCapturedPieces: ICaptures = {};
+  const possibleMovesWithCapture: string[] = [];
+  const possibleCaptures: ICaptures = {};
 
   //Red pawn move 'up' and black pawn moves 'down'. Every row is array's element which store squares.
   //So to find move for red pawn we need to check previous element (row) and for black pawn following element (row)
-  const direction = color === "red" ? -1 : 1;
+  let direction = color === "red" ? -1 : 1;
+  direction = direction * forward;
+
   const enemyColor = color === "red" ? "b" : "r";
 
   const calcMoves = (
@@ -40,7 +57,7 @@ export const findMoves = (id: string, color: string, board: string[][]) => {
     ];
 
     //Filtering coordinates which are beyond board
-    const filteredMoves = moves.filter((move) => isCoordValid(move));
+    const filteredMoves = moves.filter((move) => isIdValid(move));
     if (filteredMoves.length === 0) return;
 
     filteredMoves.forEach((move, i) => {
@@ -53,18 +70,65 @@ export const findMoves = (id: string, color: string, board: string[][]) => {
         const diagonal = moveCol < col ? -1 : 1;
 
         if (
-          isCoordValid(`${+moveRow + direction}/${+moveCol + diagonal}`) &&
+          isIdValid(`${+moveRow + direction}/${+moveCol + diagonal}`) &&
           board[+moveRow + direction][+moveCol + diagonal] === "-"
         ) {
-          // possibleCapturedPieces.push(`${moveRow}/${moveCol}`);
-          possibleCapturedPieces[
-            `${+moveRow + direction}/${+moveCol + diagonal}`
-          ] = `${moveRow}/${moveCol}`;
-
-          possibleCaptures.push(
+          possibleMovesWithCapture.push(
             `${+moveRow + direction}/${+moveCol + diagonal}`
           );
         }
+      }
+    });
+  };
+
+  const findCaptures = (
+    row: string,
+    col: string,
+    moves: string[],
+    board: string[][]
+  ) => {
+    moves.forEach((move) => {
+      const [moveRow, moveCol] = move.split("/");
+
+      //Single capture
+      if (Math.abs(+row - +moveRow) === 2) {
+        possibleCaptures[move] = [calcCapturedId(row, col, moveRow, moveCol)];
+      }
+
+      //Double capture
+      if (Math.abs(+row - +moveRow) === 4) {
+        const possiblePrevCaptures = [
+          [+moveRow - 2 * direction, +moveCol - 2],
+          [+moveRow - 2 * direction, +moveCol + 2],
+        ];
+
+        const filteredPrevCap = possiblePrevCaptures.filter(
+          (capture) =>
+            isIdValid(`${capture[0]}/${capture[1]}`) &&
+            board[capture[0]][capture[1]] === "-"
+        );
+
+        filteredPrevCap.forEach((prevCapture) => {
+          const possibleCapturedPiece = calcCapturedId(
+            String(prevCapture[0]),
+            String(prevCapture[1]),
+            moveRow,
+            moveCol
+          );
+          const [capturedRow, capturedCol] = possibleCapturedPiece.split("/");
+
+          if (board[+capturedRow][+capturedCol].indexOf(enemyColor) !== -1) {
+            possibleCaptures[move] = [
+              calcCapturedId(
+                row,
+                col,
+                String(prevCapture[0]),
+                String(prevCapture[1])
+              ),
+              `${capturedRow}/${capturedCol}`,
+            ];
+          }
+        });
       }
     });
   };
@@ -73,15 +137,29 @@ export const findMoves = (id: string, color: string, board: string[][]) => {
   calcMoves(row, col);
 
   //Find multiple captures
-  possibleCaptures.forEach((move) => {
-    const [row, col] = move.split("/");
-    calcMoves(row, col, true);
-  });
+  for (let i = 0; i < 2; i++) {
+    possibleMovesWithCapture.forEach((move) => {
+      const [row, col] = move.split("/");
+      calcMoves(row, col, true);
+    });
+  }
 
-  const moves = [...possibleMoves, ...possibleCaptures];
+  const allPossibleMoves = [...possibleMoves, ...possibleMovesWithCapture];
+
+  findCaptures(row, col, allPossibleMoves, board);
 
   return {
-    moves: [...possibleMoves, ...possibleCaptures],
-    captures: Object.values(possibleCapturedPieces),
+    possibleMoves: allPossibleMoves,
+    possibleCaptures,
   };
+};
+
+export const checkPromotes = (board: string[][]) => {
+  return board.map((row, rowIndex) => {
+    return row.map((square) => {
+      if (rowIndex === 0 && square === "rp") return "rk";
+      else if (rowIndex === 7 && square === "bp") return "bk";
+      else return square;
+    });
+  });
 };
