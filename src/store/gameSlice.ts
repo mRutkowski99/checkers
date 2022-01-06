@@ -4,6 +4,7 @@ import {
   clearActiveFields,
   findMoves,
   checkPromotes,
+  checkWinner,
 } from "../utilities/utilities";
 
 const initialGameState: IGameSlice = {
@@ -21,6 +22,7 @@ const initialGameState: IGameSlice = {
   possibleCaptures: {},
   currentPlayer: "red",
   movesWithoutCapture: 0,
+  result: "",
 };
 
 const gameSlice = createSlice({
@@ -89,6 +91,9 @@ const gameSlice = createSlice({
           const [capturedRow, capturedCol] = captured.split("/");
           state.board[+capturedRow][+capturedCol] = "-";
         });
+        state.movesWithoutCapture = 0;
+      } else {
+        state.movesWithoutCapture++;
       }
 
       //Check promotes
@@ -98,6 +103,12 @@ const gameSlice = createSlice({
       state.selected = "";
       state.board = clearActiveFields(state.board);
       state.possibleCaptures = {};
+
+      //Check if someone win
+      state.result = checkWinner(state.currentPlayer, state.board);
+
+      //Check if draw
+      if (state.movesWithoutCapture === 15) state.result = "draw";
 
       //Change player
       if (state.currentPlayer === "red") state.currentPlayer = "black";

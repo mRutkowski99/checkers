@@ -13,6 +13,12 @@ const isIdValid = (id: string) => {
   return true;
 };
 
+const isIdKing = (id: string, board: string[][]) => {
+  const [row, col] = id.split("/");
+  if (board[+row][+col].indexOf("k") !== -1) return true;
+  else return false;
+};
+
 const calcCapturedId = (
   rowStart: string,
   colStart: string,
@@ -162,4 +168,41 @@ export const checkPromotes = (board: string[][]) => {
       else return square;
     });
   });
+};
+
+export const checkWinner = (currentPlayer: string, board: string[][]) => {
+  const enemyColor = currentPlayer === "red" ? "black" : "red";
+  const enemyColorShort = currentPlayer === "red" ? "b" : "r";
+
+  //Enemy has no more pieces
+  if (!board.flat().some((square) => square.indexOf(enemyColorShort) !== -1))
+    return currentPlayer;
+
+  //Enemy has no more moves
+  const enemyIds = board
+    .map((row, rowIndex) => {
+      return row.reduce((ids: string[], square, colIndex) => {
+        if (square.indexOf(enemyColorShort) !== -1) {
+          ids.push(`${rowIndex}/${colIndex}`);
+        }
+        return ids;
+      }, []);
+    })
+    .flat();
+
+  if (
+    !enemyIds.some((id) => {
+      if (!isIdKing(id, board))
+        return findMoves(id, enemyColor, board).possibleMoves.length > 0;
+      else
+        return (
+          findMoves(id, enemyColor, board).possibleMoves.length > 0 &&
+          findMoves(id, enemyColor, board, -1).possibleMoves.length > 0
+        );
+    })
+  ) {
+    return currentPlayer;
+  }
+
+  return "";
 };

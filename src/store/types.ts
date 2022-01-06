@@ -6,4 +6,5 @@ export interface IGameSlice {
   };
   currentPlayer: string;
   movesWithoutCapture: number;
+  result: string;
 }
