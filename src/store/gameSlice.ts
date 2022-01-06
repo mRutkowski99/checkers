@@ -23,6 +23,10 @@ const initialGameState: IGameSlice = {
   currentPlayer: "red",
   movesWithoutCapture: 0,
   result: "",
+  capturedPieces: {
+    red: 0,
+    black: 0,
+  },
 };
 
 const gameSlice = createSlice({
@@ -84,14 +88,18 @@ const gameSlice = createSlice({
       state.board[+pieceRow][+pieceCol] = "-";
 
       //Remove captured pieces
-      const capturesPieces = state.possibleCaptures[id];
+      const capturedPieces = state.possibleCaptures[id];
 
-      if (capturesPieces) {
-        capturesPieces.forEach((captured) => {
+      if (capturedPieces) {
+        capturedPieces.forEach((captured) => {
           const [capturedRow, capturedCol] = captured.split("/");
           state.board[+capturedRow][+capturedCol] = "-";
         });
+
         state.movesWithoutCapture = 0;
+
+        state.capturedPieces[state.currentPlayer === "red" ? "black" : "red"] +=
+          capturedPieces.length;
       } else {
         state.movesWithoutCapture++;
       }
