@@ -1,9 +1,12 @@
 export const clearActiveFields = (board: string[][]) => {
   //clear board from active field (place where piece can possibly move)
-
   return board.map((row) =>
     row.map((square) => (square === "a" ? "-" : square))
   );
+};
+
+const calcId = (row: number, col: number) => {
+  return [row, col].join("/");
 };
 
 const isIdValid = (id: string) => {
@@ -25,9 +28,10 @@ const calcCapturedId = (
   rowEnd: string,
   colEnd: string
 ) => {
-  return `${Math.abs((+rowStart + +rowEnd) / 2)}/${Math.abs(
-    (+colStart + +colEnd) / 2
-  )}`;
+  return calcId(
+    Math.abs((+rowStart + +rowEnd) / 2),
+    Math.abs((+colStart + +colEnd) / 2)
+  );
 };
 
 interface ICaptures {
@@ -38,121 +42,97 @@ export const findMoves = (
   id: string,
   color: string,
   board: string[][],
-  forward: number = 1
+  isKing: boolean
 ) => {
   const possibleMoves: string[] = []; //stores coordinates of possible moves
-  const possibleMovesWithCapture: string[] = [];
   const possibleCaptures: ICaptures = {};
 
   //Red pawn move 'up' and black pawn moves 'down'. Every row is array's element which store squares.
   //So to find move for red pawn we need to check previous element (row) and for black pawn following element (row)
-  let direction = color === "red" ? -1 : 1;
-  direction = direction * forward;
+  const direction = color === "red" ? -1 : 1;
 
   const enemyColor = color === "red" ? "b" : "r";
 
-  const calcMoves = (
-    row: string,
-    col: string,
-    onlyCaptures: boolean = false
-  ) => {
+  const calcMoves = (row: string, col: string) => {
     //Pawns can only move on diagonals so the possible moves are squares on the left and right in the previous/following row
     const moves = [
-      `${+row + direction}/${+col - 1}`,
-      `${+row + direction}/${+col + 1}`,
+      calcId(+row + direction, +col - 1),
+      calcId(+row + direction, +col + 1),
     ];
 
-    //Filtering coordinates which are beyond board
+    if (isKing) {
+      moves.push(calcId(+row - direction, +col - 1));
+      moves.push(calcId(+row - direction, +col - 1));
+    }
+
+    //Filtering ids which are beyond board
     const filteredMoves = moves.filter((move) => isIdValid(move));
     if (filteredMoves.length === 0) return;
 
-    filteredMoves.forEach((move, i) => {
+    filteredMoves.forEach((move) => {
       const [moveRow, moveCol] = move.split("/");
-
-      if (board[+moveRow][+moveCol] === "-" && !onlyCaptures)
-        possibleMoves.push(move);
-
-      if (board[+moveRow][+moveCol].indexOf(enemyColor) !== -1) {
-        const diagonal = moveCol < col ? -1 : 1;
-
-        if (
-          isIdValid(`${+moveRow + direction}/${+moveCol + diagonal}`) &&
-          board[+moveRow + direction][+moveCol + diagonal] === "-"
-        ) {
-          possibleMovesWithCapture.push(
-            `${+moveRow + direction}/${+moveCol + diagonal}`
-          );
-        }
-      }
+      if (board[+moveRow][+moveCol] === "-") possibleMoves.push(move);
     });
   };
 
-  const findCaptures = (
-    row: string,
-    col: string,
-    moves: string[],
-    board: string[][]
+  const calcCaptures = (
+    row: number,
+    col: number,
+    board: string[][],
+    isKing: boolean,
+    previousCaptures: string[] = []
   ) => {
-    moves.forEach((move) => {
-      const [moveRow, moveCol] = move.split("/");
+    const moves = [
+      [+row + 2 * direction, +col + 2],
+      [+row + 2 * direction, +col - 2],
+    ];
 
-      //Single capture
-      if (Math.abs(+row - +moveRow) === 2) {
-        possibleCaptures[move] = [calcCapturedId(row, col, moveRow, moveCol)];
-      }
+    if (isKing) {
+      moves.push([+row - 2 * direction, +col + 2]);
+      moves.push([+row - 2 * direction, +col + 2]);
+    }
 
-      //Double capture
-      if (Math.abs(+row - +moveRow) === 4) {
-        const possiblePrevCaptures = [
-          [+moveRow - 2 * direction, +moveCol - 2],
-          [+moveRow - 2 * direction, +moveCol + 2],
+    const validMoves = moves.filter((move) =>
+      isIdValid(calcId(move[0], move[1]))
+    );
+
+    const legalMoves = validMoves.filter(
+      (move) => board[move[0]][move[1]] === "-"
+    );
+
+    if (legalMoves.length === 0) return;
+
+    legalMoves.forEach((move) => {
+      const capturedId = calcCapturedId(
+        String(row),
+        String(col),
+        String(move[0]),
+        String(move[1])
+      );
+
+      if (board[+capturedId[0]][+capturedId[2]].indexOf(enemyColor) !== -1) {
+        possibleCaptures[calcId(move[0], move[1])] = [
+          capturedId,
+          ...previousCaptures,
         ];
-
-        const filteredPrevCap = possiblePrevCaptures.filter(
-          (capture) =>
-            isIdValid(`${capture[0]}/${capture[1]}`) &&
-            board[capture[0]][capture[1]] === "-"
+        return calcCaptures(
+          move[0],
+          move[1],
+          board,
+          isKing,
+          possibleCaptures[calcId(move[0], move[1])]
         );
-
-        filteredPrevCap.forEach((prevCapture) => {
-          const possibleCapturedPiece = calcCapturedId(
-            String(prevCapture[0]),
-            String(prevCapture[1]),
-            moveRow,
-            moveCol
-          );
-          const [capturedRow, capturedCol] = possibleCapturedPiece.split("/");
-
-          if (board[+capturedRow][+capturedCol].indexOf(enemyColor) !== -1) {
-            possibleCaptures[move] = [
-              calcCapturedId(
-                row,
-                col,
-                String(prevCapture[0]),
-                String(prevCapture[1])
-              ),
-              `${capturedRow}/${capturedCol}`,
-            ];
-          }
-        });
-      }
+      } else return;
     });
   };
 
   const [row, col] = id.split("/");
   calcMoves(row, col);
+  calcCaptures(+row, +col, board, isKing);
 
-  //Find multiple captures
-  for (let i = 0; i < 2; i++) {
-    possibleMovesWithCapture.forEach((move) => {
-      const [row, col] = move.split("/");
-      calcMoves(row, col, true);
-    });
-  }
+  const allPossibleMoves = [...possibleMoves, ...Object.keys(possibleCaptures)];
 
-  const allPossibleMoves = [...possibleMoves, ...possibleMovesWithCapture];
-
-  findCaptures(row, col, allPossibleMoves, board);
+  console.log(possibleCaptures);
 
   return {
     possibleMoves: allPossibleMoves,
@@ -191,15 +171,11 @@ export const checkWinner = (currentPlayer: string, board: string[][]) => {
     .flat();
 
   if (
-    !enemyIds.some((id) => {
-      if (!isIdKing(id, board))
-        return findMoves(id, enemyColor, board).possibleMoves.length > 0;
-      else
-        return (
-          findMoves(id, enemyColor, board).possibleMoves.length > 0 &&
-          findMoves(id, enemyColor, board, -1).possibleMoves.length > 0
-        );
-    })
+    !enemyIds.some(
+      (id) =>
+        findMoves(id, enemyColor, board, isIdKing(id, board)).possibleMoves
+          .length > 0
+    )
   ) {
     return currentPlayer;
   }
