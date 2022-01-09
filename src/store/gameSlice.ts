@@ -5,7 +5,7 @@ import {
   findMoves,
   checkPromotes,
   checkWinner,
-} from "../utilities/utilities";
+} from "../utilities/gameLogic";
 
 const initialGameState: IGameSlice = {
   board: [
@@ -33,7 +33,7 @@ const gameSlice = createSlice({
   name: "game",
   initialState: initialGameState,
   reducers: {
-    clickPawn(state, action) {
+    selectPiece(state, action) {
       const { id, color, isKing } = action.payload;
 
       //Highlight selected pawn. If pawn was selected again remove highlight
@@ -48,20 +48,6 @@ const gameSlice = createSlice({
       }
 
       state.board = clearActiveFields(state.board); //Clear active squares from previous selection
-
-      //Find possible moves and mark squares as active
-      // const { possibleMoves: movesForward, possibleCaptures: capturesForward } =
-      //   findMoves(id, color, state.board);
-
-      // const movesBackward = isKing
-      //   ? findMoves(id, color, state.board).possibleMoves
-      //   : [];
-
-      // const capturesBackward = isKing
-      //   ? findMoves(id, color, state.board).possibleCaptures
-      //   : {};
-
-      // const possibleMoves = [...movesForward, ...movesBackward];
 
       const { possibleMoves, possibleCaptures } = findMoves(
         id,
@@ -124,6 +110,10 @@ const gameSlice = createSlice({
       //Change player
       if (state.currentPlayer === "red") state.currentPlayer = "black";
       else state.currentPlayer = "red";
+    },
+
+    resetGame(state) {
+      state = initialGameState;
     },
   },
 });

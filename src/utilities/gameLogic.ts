@@ -46,7 +46,6 @@ export const findMoves = (
 ) => {
   const possibleMoves: string[] = []; //stores coordinates of possible moves
   const possibleCaptures: ICaptures = {};
-
   //Red pawn move 'up' and black pawn moves 'down'. Every row is array's element which store squares.
   //So to find move for red pawn we need to check previous element (row) and for black pawn following element (row)
   const direction = color === "red" ? -1 : 1;
@@ -62,7 +61,7 @@ export const findMoves = (
 
     if (isKing) {
       moves.push(calcId(+row - direction, +col - 1));
-      moves.push(calcId(+row - direction, +col - 1));
+      moves.push(calcId(+row - direction, +col + 1));
     }
 
     //Filtering ids which are beyond board
@@ -73,6 +72,8 @@ export const findMoves = (
       const [moveRow, moveCol] = move.split("/");
       if (board[+moveRow][+moveCol] === "-") possibleMoves.push(move);
     });
+
+    return;
   };
 
   const calcCaptures = (
@@ -89,7 +90,7 @@ export const findMoves = (
 
     if (isKing) {
       moves.push([+row - 2 * direction, +col + 2]);
-      moves.push([+row - 2 * direction, +col + 2]);
+      moves.push([+row - 2 * direction, +col - 2]);
     }
 
     const validMoves = moves.filter((move) =>
@@ -109,6 +110,8 @@ export const findMoves = (
         String(move[0]),
         String(move[1])
       );
+
+      if (possibleCaptures[calcId(move[0], move[1])]) return; //prevent from infinite loop
 
       if (board[+capturedId[0]][+capturedId[2]].indexOf(enemyColor) !== -1) {
         possibleCaptures[calcId(move[0], move[1])] = [
@@ -131,8 +134,6 @@ export const findMoves = (
   calcCaptures(+row, +col, board, isKing);
 
   const allPossibleMoves = [...possibleMoves, ...Object.keys(possibleCaptures)];
-
-  console.log(possibleCaptures);
 
   return {
     possibleMoves: allPossibleMoves,

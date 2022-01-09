@@ -18,7 +18,7 @@ body {
     padding: 2rem 0;
     display: flex;
     justify-content: center;
-    background-color: rgb(255, 252, 247);
+    background-color: rgb(255, 232, 220);
 }
 `;
 

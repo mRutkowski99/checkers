@@ -26,7 +26,7 @@ function Square({ dark, id, isEmpty, pawnColor, isKing, active }: IProps) {
   const clickHandler = () => {
     if (!isEmpty && currentPlayer === pawnColor)
       dispatch(
-        gameActions.clickPawn({ id: id, color: pawnColor, isKing: isKing })
+        gameActions.selectPiece({ id: id, color: pawnColor, isKing: isKing })
       );
 
     if (isEmpty && active) dispatch(gameActions.selectMove({ id: id }));
