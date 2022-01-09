@@ -9,12 +9,12 @@ import {
 
 const initialGameState: IGameSlice = {
   board: [
-    ["bp", "-", "-", "-", "-", "-", "-", "-"],
+    ["bp", "-", "bp", "-", "bp", "-", "bp", "-"],
     ["-", "bp", "-", "bp", "-", "bp", "-", "bp"],
-    ["-", "-", "-", "-", "-", "-", "bp", "-"],
-    ["-", "bp", "-", "bp", "-", "-", "-", "-"],
-    ["rp", "-", "-", "-", "-", "-", "-", "-"],
-    ["-", "bp", "-", "rp", "-", "rp", "-", "rp"],
+    ["bp", "-", "bp", "-", "bp", "-", "bp", "-"],
+    ["-", "-", "-", "-", "-", "-", "-", "-"],
+    ["-", "-", "-", "-", "-", "-", "-", "-"],
+    ["-", "rp", "-", "rp", "-", "rp", "-", "rp"],
     ["rp", "-", "rp", "-", "rp", "-", "rp", "-"],
     ["-", "rp", "-", "rp", "-", "rp", "-", "rp"],
   ],
@@ -107,13 +107,19 @@ const gameSlice = createSlice({
       //Check if draw
       if (state.movesWithoutCapture === 15) state.result = "draw";
 
+      console.log(state.result);
+
       //Change player
       if (state.currentPlayer === "red") state.currentPlayer = "black";
       else state.currentPlayer = "red";
     },
 
     resetGame(state) {
-      state = initialGameState;
+      state.board = initialGameState.board;
+      state.currentPlayer = "red";
+      state.movesWithoutCapture = 0;
+      state.result = "";
+      state.capturedPieces = initialGameState.capturedPieces;
     },
   },
 });

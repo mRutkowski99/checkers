@@ -7,6 +7,14 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
 }
 
+ul {
+    list-style-type: none;
+
+    & > li:not(:last-child) {
+        margin-bottom: 1.5rem;
+    }
+}
+
 html {
     font-size: 67.5%;
 }
