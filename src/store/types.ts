@@ -17,8 +17,12 @@ export interface IGameSlice {
 export interface IModalSlice {
   isOpen: boolean;
   content: string | FunctionComponent;
+}
+
+export interface IGameSettingsSlice {
   playerNames: {
     red: string;
     black: string;
   };
+  opponent: string;
 }

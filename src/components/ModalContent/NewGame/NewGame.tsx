@@ -5,6 +5,7 @@ import Input from "../../Input/Input";
 import { useDispatch } from "react-redux";
 import modalActions from "../../../store/modalSlice";
 import gameActions from "../../../store/gameSlice";
+import settingsActions from "../../../store/gameSettingsSlice";
 
 const NewGame = () => {
   const [redName, setRedName] = useState("Player 1");
@@ -17,7 +18,7 @@ const NewGame = () => {
 
   const submitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    dispatch(modalActions.setNames({ redName, blackName }));
+    dispatch(settingsActions.setNames({ redName, blackName }));
     dispatch(modalActions.close());
     dispatch(gameActions.resetGame());
   };

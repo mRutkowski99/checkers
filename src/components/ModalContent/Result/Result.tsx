@@ -9,7 +9,7 @@ const Result = () => {
   const dispatch = useDispatch();
   const result = useSelector((state: RootState) => state.game.result);
   const { red: redName, black: blackName } = useSelector(
-    (state: RootState) => state.modal.playerNames
+    (state: RootState) => state.settings.playerNames
   );
   let paragraph = "";
 

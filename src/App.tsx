@@ -15,7 +15,7 @@ function App() {
   const dispatch = useDispatch();
   const isModalOpen = useSelector((state: RootState) => state.modal.isOpen);
   const { red, black } = useSelector(
-    (state: RootState) => state.modal.playerNames
+    (state: RootState) => state.settings.playerNames
   );
   const result = useSelector((state: RootState) => state.game.result);
   const player = useSelector((state: RootState) => state.game.currentPlayer);
