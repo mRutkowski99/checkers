@@ -1,5 +1,5 @@
 import Button from "../../Button/Button";
-import { BtnContainer } from "../../../utilities/styleUtils.styled";
+import { BtnContainer } from "../../../helpers/styleUtils.styled";
 import { useDispatch } from "react-redux";
 import modalActions from "../../../store/modalSlice";
 

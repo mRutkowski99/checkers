@@ -5,7 +5,7 @@ export const clearActiveFields = (board: string[][]) => {
   );
 };
 
-const calcId = (row: number, col: number) => {
+export const calcId = (row: number, col: number) => {
   return [row, col].join("/");
 };
 
@@ -16,9 +16,9 @@ const isIdValid = (id: string) => {
   return true;
 };
 
-const isIdKing = (id: string, board: string[][]) => {
+export const isIdKing = (id: string, board: string[][]) => {
   const [row, col] = id.split("/");
-  if (board[+row][+col].indexOf("k") !== -1) return true;
+  if (board[+row][+col].includes("k")) return true;
   else return false;
 };
 
@@ -113,7 +113,7 @@ export const findMoves = (
 
       if (possibleCaptures[calcId(move[0], move[1])]) return; //prevent from infinite loop
 
-      if (board[+capturedId[0]][+capturedId[2]].indexOf(enemyColor) !== -1) {
+      if (board[+capturedId[0]][+capturedId[2]].includes(enemyColor)) {
         possibleCaptures[calcId(move[0], move[1])] = [
           capturedId,
           ...previousCaptures,
@@ -141,7 +141,7 @@ export const findMoves = (
   };
 };
 
-export const checkPromotes = (board: string[][]) => {
+export const checkPromotions = (board: string[][]) => {
   return board.map((row, rowIndex) => {
     return row.map((square) => {
       if (rowIndex === 0 && square === "rp") return "rk";
@@ -151,19 +151,19 @@ export const checkPromotes = (board: string[][]) => {
   });
 };
 
-export const checkWinner = (currentPlayer: string, board: string[][]) => {
+export const checkIfWinner = (currentPlayer: string, board: string[][]) => {
   const enemyColor = currentPlayer === "red" ? "black" : "red";
   const enemyColorShort = currentPlayer === "red" ? "b" : "r";
 
   //Enemy has no more pieces
-  if (!board.flat().some((square) => square.indexOf(enemyColorShort) !== -1))
-    return currentPlayer;
+  if (!board.flat().some((square) => square.includes(enemyColorShort)))
+    return true;
 
   //Enemy has no more moves
   const enemyIds = board
     .map((row, rowIndex) => {
       return row.reduce((ids: string[], square, colIndex) => {
-        if (square.indexOf(enemyColorShort) !== -1) {
+        if (square.includes(enemyColorShort)) {
           ids.push(`${rowIndex}/${colIndex}`);
         }
         return ids;
@@ -178,8 +178,8 @@ export const checkWinner = (currentPlayer: string, board: string[][]) => {
           .length > 0
     )
   ) {
-    return currentPlayer;
+    return true;
   }
 
-  return "";
+  return false;
 };

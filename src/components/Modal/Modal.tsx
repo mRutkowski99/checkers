@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import ReactDOM from "react-dom";
 import * as Style from "./Modal.styled";
 import { useSelector } from "react-redux";

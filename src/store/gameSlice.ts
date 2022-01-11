@@ -3,9 +3,9 @@ import { IGameSlice } from "./types";
 import {
   clearActiveFields,
   findMoves,
-  checkPromotes,
-  checkWinner,
-} from "../utilities/gameLogic";
+  checkPromotions,
+  checkIfWinner,
+} from "../helpers/gameLogic";
 
 const initialGameState: IGameSlice = {
   board: [
@@ -94,7 +94,7 @@ const gameSlice = createSlice({
       }
 
       //Check promotes
-      state.board = checkPromotes(state.board);
+      state.board = checkPromotions(state.board);
 
       //Reset selected piece and clear possible moves
       state.selected = "";
@@ -102,12 +102,11 @@ const gameSlice = createSlice({
       state.possibleCaptures = {};
 
       //Check if someone win
-      state.result = checkWinner(state.currentPlayer, state.board);
+      if (checkIfWinner(state.currentPlayer, state.board))
+        state.result = state.currentPlayer;
 
       //Check if draw
       if (state.movesWithoutCapture === 15) state.result = "draw";
-
-      console.log(state.result);
 
       //Change player
       if (state.currentPlayer === "red") state.currentPlayer = "black";

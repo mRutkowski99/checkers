@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BtnContainer, Flex } from "../../../utilities/styleUtils.styled";
+import { BtnContainer, Flex } from "../../../helpers/styleUtils.styled";
 import Button from "../../Button/Button";
 import Input from "../../Input/Input";
 import { useDispatch } from "react-redux";
@@ -24,16 +24,17 @@ const NewGame = () => {
 
   return (
     <form onSubmit={submitHandler}>
+      <h2>Who's gonna play?</h2>
       <Flex>
         <Input
-          label="Red Player"
-          placeholder="Player1"
+          label="Red pieces:"
+          placeholder="Player 1"
           id="red-player"
           onChange={redNameHandler}
         />
         <Input
-          label="Black Player"
-          placeholder="Player2"
+          label="Black pieces:"
+          placeholder="Player 2"
           id="black-player"
           onChange={blackNameHandler}
         />

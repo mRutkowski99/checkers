@@ -5,14 +5,27 @@ import PlayerBadge from "./components/PlayerBadge/PlayerBadge";
 import Nav from "./layout/Nav/Nav";
 import Modal from "./components/Modal/Modal";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "./store/store";
+import { useEffect } from "react";
+import modalActions from "./store/modalSlice";
+import useAI from "./hooks/useAI";
 
 function App() {
+  const dispatch = useDispatch();
   const isModalOpen = useSelector((state: RootState) => state.modal.isOpen);
   const { red, black } = useSelector(
     (state: RootState) => state.modal.playerNames
   );
+  const result = useSelector((state: RootState) => state.game.result);
+  const player = useSelector((state: RootState) => state.game.currentPlayer);
+
+  useEffect(() => {
+    if (!result) return;
+    dispatch(modalActions.open("result"));
+  }, [result]);
+
+  useAI(player);
 
   return (
     <>

@@ -1,10 +1,9 @@
 import Button from "../../Button/Button";
-import { BtnContainer } from "../../../utilities/styleUtils.styled";
+import { BtnContainer } from "../../../helpers/styleUtils.styled";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../store/store";
 import gameActions from "../../../store/gameSlice";
 import modalActions from "../../../store/modalSlice";
-import { useEffect } from "react";
 
 const Result = () => {
   const dispatch = useDispatch();
@@ -14,16 +13,9 @@ const Result = () => {
   );
   let paragraph = "";
 
-  console.log(result);
-
-  useEffect(() => {
-    if (!result) return;
-    dispatch(modalActions.open("result"));
-
-    if (result === "draw") paragraph = "Draw!";
-    if (result === "red") paragraph = `${redName} wins!`;
-    if (result === "black") paragraph = `${blackName} wins!`;
-  }, [result]);
+  if (result === "draw") paragraph = "Draw!";
+  if (result === "red") paragraph = `${redName} wins!`;
+  if (result === "black") paragraph = `${blackName} wins!`;
 
   const newGameHandler = () => dispatch(modalActions.open("new-game"));
 
